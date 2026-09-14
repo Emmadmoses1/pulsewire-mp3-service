@@ -127,7 +127,7 @@ app.post('/convert',async(req,res)=>{
       '--no-playlist',
       '--no-warnings',
       '--restrict-filenames',
-      '-f','bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio/best',
+      '-f','bestaudio',
       '-o',source,
       url
     ]);
