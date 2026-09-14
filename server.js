@@ -45,7 +45,7 @@ function safeName(s){
 function isYouTubeUrl(value){
   try{
     const u=new URL(value);
-    const host=u.hostname.toLowerCase().replace(/^www\\./,'');
+    const host=u.hostname.toLowerCase().replace(/^www\./, '');
     return host==='youtube.com' ||
            host==='m.youtube.com' ||
            host==='music.youtube.com' ||
