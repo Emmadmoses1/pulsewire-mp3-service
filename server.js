@@ -229,3 +229,36 @@ const PORT=process.env.PORT||10000;
 app.listen(PORT,()=>{
   console.log(`PulseWire MP3 service running on port ${PORT}`);
 });
+
+// ── Merge endpoint: prepend tag to song ──────────
+app.post('/merge', async(req,res)=>{
+  const {tagUrl, songUrl} = req.body;
+  if(!tagUrl||!songUrl) return res.status(400).json({error:'tagUrl and songUrl required'});
+
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'pw-merge-'));
+  try{
+    const tagFile=path.join(dir,'tag.mp3');
+    const songFile=path.join(dir,'song.mp3');
+    const outFile=path.join(dir,'merged.mp3');
+    const listFile=path.join(dir,'list.txt');
+
+    // Download tag
+    await run('yt-dlp',['-o',tagFile,'--no-playlist',tagUrl]);
+    // Download song
+    await run('yt-dlp',['-o',songFile,'--no-playlist',songUrl]);
+
+    // Write concat list
+    fs.writeFileSync(listFile,`file '${tagFile}'\nfile '${songFile}'\n`);
+
+    // Merge with ffmpeg
+    await run('ffmpeg',['-f','concat','-safe','0','-i',listFile,'-c','copy',outFile]);
+
+    const data=fs.readFileSync(outFile);
+    res.set({'Content-Type':'audio/mpeg','Content-Disposition':'attachment; filename="pulsewire.mp3"'});
+    res.send(data);
+  }catch(e){
+    res.status(500).json({error:'Merge failed.',detail:e.message});
+  }finally{
+    fs.rmSync(dir,{recursive:true,force:true});
+  }
+});
