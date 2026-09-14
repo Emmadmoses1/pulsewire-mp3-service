@@ -242,10 +242,9 @@ app.post('/merge', async(req,res)=>{
     const outFile=path.join(dir,'merged.mp3');
     const listFile=path.join(dir,'list.txt');
 
-    // Download tag
-    await run('yt-dlp',['-o',tagFile,'--no-playlist',tagUrl]);
-    // Download song
-    await run('yt-dlp',['-o',songFile,'--no-playlist',songUrl]);
+    // Download tag and song directly
+    await run('curl',['-L','-o',tagFile,tagUrl]);
+    await run('curl',['-L','-o',songFile,songUrl]);
 
     // Write concat list
     fs.writeFileSync(listFile,`file '${tagFile}'\nfile '${songFile}'\n`);
