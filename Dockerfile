@@ -16,3 +16,6 @@ ENV PORT=10000
 EXPOSE 10000
 
 CMD ["npm","start"]
+
+# Force yt-dlp update
+RUN pip3 install --break-system-packages --upgrade yt-dlp
